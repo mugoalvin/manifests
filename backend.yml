@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yolo_backend
+  namespace: yolo_app
+  labels:
+    app: yolo
+    component: back
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: back
+  template:
+    metadata:
+      labels:
+        app: yolo
+        component: back
+    spec:
+    containers:
+        - name: yolo_backend_container
+          image: yolo_backend_image
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+          - name: yolo_volume
+            mountPath: /var/www/html
+    volumes:
+      - name: yolo_volume
+        persistentVolumeClaim:
+          claimName: yolo_cname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yolo_backend
+  namespace: yolo_app
+  labels:
+    app: yolo
+    component: back
+spec:
+  selector:
+    app: yolo
+    component: back
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+      name: http     # yolo-ip4

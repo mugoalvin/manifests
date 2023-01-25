@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yolo_client
+  namespace: yolo_app
+  labels:
+    app: yolo
+    component: front
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: front
+  template:
+    metadata:
+      labels:
+        app: yolo
+        component: front
+    spec:
+    containers:
+        - name: yolo_client_container
+          image: yolo_client_image
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+          - name: yolo_volume
+            mountPath: /var/www/html
+    volumes:
+      - name: yolo_volume
+        persistentVolumeClaim:
+          claimName: yolo_cname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yolo_frontend
+  namespace: yolo_app
+  labels:
+    app: yolo
+    component: front
+spec:
+  type: LoadBalancer
+  selector:
+    app: yolo
+    component: front
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
