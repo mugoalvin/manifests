@@ -13,3 +13,4 @@ spec:
   type: Standalone
   persistent: true
   exposedExternally: true
+  
